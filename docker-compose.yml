@@ -1,0 +1,11 @@
+# Etapa 0: solo SQL Server. En la Etapa 6 se suman los servicios api y web (ver REPASO §22).
+services:
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SQL_PASSWORD}   # viene del archivo .env (ver .env.example)
+    ports: ["1433:1433"]
+    volumes: [sqldata:/var/opt/mssql]
+volumes:
+  sqldata:
