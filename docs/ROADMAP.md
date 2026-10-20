@@ -97,7 +97,7 @@ Orden sugerido. Cada regla es uno o más ciclos 🔴🟢🔵:
 
 1. `AppDbContext` con el proveedor de SQL Server y configuraciones con `IEntityTypeConfiguration<T>`.
 2. Primera migración y revisión del SQL generado (`dotnet ef migrations script`).
-3. Tabla `TurnosOcupados (CanchaId, SlotInicio, ReservaId)` con **índice único** en `(CanchaId, SlotInicio)`: la base rechaza dos reservas que ocupen el mismo bloque (R4 doble protección). Al cancelar o vencer una reserva se borran sus slots.
+3. Tabla `TurnosOcupados (CanchaId, SlotInicio, ReservaId)` con **clave primaria compuesta** `(CanchaId, SlotInicio)`: la base rechaza dos reservas que ocupen el mismo bloque (R4 doble protección). Al cancelar o vencer una reserva se borran sus slots.
 4. Concurrencia optimista con `rowversion` en `Reserva`. Índices: `Reservas (CanchaId, Inicio)`, `Reservas (ClienteId, Estado)`.
 5. Implementar `IReservaRepository` y `ICanchaRepository`.
 6. Seed de datos de ejemplo: un complejo, 3 canchas y algunas reservas.
@@ -280,7 +280,7 @@ En la práctica, el pipeline de CI (pasos 1–3) conviene armarlo apenas termine
 ## Etapa 14 · Portfolio y entrevista
 
 1. README con capturas, un GIF del flujo, el diagrama de arquitectura, cómo correrlo y los links de producción.
-2. Sección "Decisiones técnicas": por qué la tabla de slots con índice único, por qué el Result pattern, por qué TimeProvider y por qué Managed Identity.
+2. Sección "Decisiones técnicas": por qué la tabla de slots con clave primaria compuesta, por qué el Result pattern, por qué TimeProvider y por qué Managed Identity.
 2b. Diagrama de la arquitectura en Azure (App Service, Static Web Apps, Azure SQL, Key Vault, Application Insights) y captura del pipeline y del tablero de Boards.
 3. Usuarios demo (jugador y dueño) para quien revise el proyecto.
 4. Correr `/entrevista` varias veces y practicar la explicación del proyecto en 2 minutos.
