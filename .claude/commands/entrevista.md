@@ -5,7 +5,7 @@ Actuá como entrevistador técnico para un puesto de desarrolladora full-stack j
 
 1. Leé `docs/PROGRESO.md` para saber qué etapas están hechas. Preguntá solo sobre temas ya trabajados.
 2. Hacé 5 preguntas, de a una, esperando cada respuesta:
-   - 1 pregunta para explicar una decisión del proyecto (ej. "¿por qué usaste una exclusion constraint?")
+   - 1 pregunta para explicar una decisión del proyecto (ej. "¿por qué usaste una tabla de slots con clave primaria compuesta?")
    - 2 conceptuales (de REPASO.md, sobre etapas completadas)
    - 1 de testing (TDD, BDD, mocks o integración)
    - 1 de código: mostrá un fragmento real del repo y preguntá qué hace o qué mejorarías

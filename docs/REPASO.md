@@ -416,7 +416,7 @@ Los dos pasan la validación en el código, porque consultan antes de que el otr
 
 <details><summary>¿Por qué slots de 30 minutos y no guardar solo inicio y fin?</summary>
 
-Porque una clave única compara valores iguales, no rangos. Al partir el tiempo en bloques fijos, "se superponen" pasa a ser "comparten un bloque", y eso sí lo puede garantizar un índice único. Funciona porque los turnos siempre empiezan en la grilla de 30 minutos (R2). En Postgres existiría una alternativa nativa: las exclusion constraints con rangos.
+Porque una clave única compara valores iguales, no rangos. Al partir el tiempo en bloques fijos, "se superponen" pasa a ser "comparten un bloque", y eso sí lo puede garantizar la clave primaria compuesta `(CanchaId, SlotInicio)`. Funciona porque los turnos siempre empiezan en la grilla de 30 minutos (R2). En Postgres existiría una alternativa nativa: las exclusion constraints con rangos.
 </details>
 
 <details><summary>¿Concurrencia optimista vs pesimista?</summary>
