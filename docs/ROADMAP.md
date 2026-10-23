@@ -36,7 +36,7 @@ Todo test y toda feature Gherkin sale de esta lista. Si aparece una regla nueva,
 
 1. Crear el repo en GitHub (público) con README, `.gitignore` (VisualStudio + Node) y la rama `main` protegida.
 2. Copiar este kit: `CLAUDE.md`, `docs/`, `.claude/commands/`.
-3. `docker-compose.yml` con SQL Server 2022 y verificar la conexión desde SSMS o Azure Data Studio.
+3. `docker-compose.yml` con SQL Server 2022 y verificar la conexión desde SSMS o la extensión mssql de VS Code (`localhost,1433`, usuario `sa`, *Trust server certificate*).
 4. Crear la solución y los 8 proyectos vacíos (4 de `src`, 4 de `tests`) con sus referencias.
 5. **Azure DevOps:** crear la organización y el proyecto `ReservasCanchas` (proceso Agile o Scrum) y conectar el repo de GitHub.
 6. **Pedir ya el grant gratuito de parallel jobs** de Azure Pipelines. Se tramita con un formulario de Microsoft y puede tardar unos días. Mientras tanto, se puede usar un agente self-hosted en la PC.
