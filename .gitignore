@@ -3,7 +3,7 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
-# ---- Reservas de Canchas: agregados propios (Node, Vite, Playwright, secretos) ----
+# ---- Fulbito: agregados propios (Node, Vite, Playwright, secretos) ----
 
 # Secretos: se ignoran los .env reales, pero la plantilla sí se versiona
 .env

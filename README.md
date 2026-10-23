@@ -1,4 +1,4 @@
-# Reservas de Canchas
+# Fulbito · Reservas de canchas
 
 App para reservar canchas de pádel y fútbol 5, hecha con .NET 10 + React + Azure SQL, con TDD, BDD y tests de punta a punta. Desplegada en Azure con Azure Pipelines y gestionada en Azure Boards.
 

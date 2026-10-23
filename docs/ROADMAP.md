@@ -1,4 +1,4 @@
-# Roadmap del proyecto · Reservas de Canchas
+# Roadmap del proyecto — Fulbito · Reservas de canchas
 
 App para reservar canchas de pádel y fútbol 5, desplegada en Azure y gestionada con Azure DevOps. Hay tres roles:
 
@@ -38,7 +38,7 @@ Todo test y toda feature Gherkin sale de esta lista. Si aparece una regla nueva,
 2. Copiar este kit: `CLAUDE.md`, `docs/`, `.claude/commands/`.
 3. `docker-compose.yml` con SQL Server 2022 y verificar la conexión desde SSMS o la extensión mssql de VS Code (`localhost,1433`, usuario `sa`, *Trust server certificate*).
 4. Crear la solución y los 8 proyectos vacíos (4 de `src`, 4 de `tests`) con sus referencias.
-5. **Azure DevOps:** crear la organización y el proyecto `ReservasCanchas` (proceso Agile o Scrum) y conectar el repo de GitHub.
+5. **Azure DevOps:** crear la organización y el proyecto `Fulbito` (proceso Agile o Scrum) y conectar el repo de GitHub.
 6. **Pedir ya el grant gratuito de parallel jobs** de Azure Pipelines. Se tramita con un formulario de Microsoft y puede tardar unos días. Mientras tanto, se puede usar un agente self-hosted en la PC.
 7. **Cuenta de Azure:** crear la cuenta gratuita y, **antes que nada**, una alerta de presupuesto (Cost Management → Budgets) de unos pocos dólares.
 8. Primer commit y primer PR, aunque sea trivial, para practicar el flujo.
@@ -161,7 +161,7 @@ Orden sugerido. Cada regla es uno o más ciclos 🔴🟢🔵:
 
 **Objetivo:** que las features de la Etapa 1 se ejecuten como tests.
 
-1. Configurar Reqnroll en `ReservasCanchas.Specs` con features en español.
+1. Configurar Reqnroll en `Fulbito.Specs` con features en español.
 2. Implementar los steps de `reservar.feature` contra la capa Application, usando fakes en memoria y `FakeTimeProvider`.
 3. Agregar `cancelar.feature` con un *Esquema del escenario* (tabla de anticipaciones → seña devuelta o perdida).
 4. **Tu turno:** `precios.feature` completa, escrita y conectada por Agustina.
@@ -240,7 +240,11 @@ En la práctica, el pipeline de CI (pasos 1–3) conviene armarlo apenas termine
 2. GitHub: branch protection en `main` exigiendo que el check de Azure Pipelines pase.
 3. Badge del pipeline en el README.
 
-**Recursos en Azure** (todo en un resource group `rg-reservas-canchas`, región cercana, tiers gratuitos)
+**Recursos en Azure** (todo en un resource group `rg-fulbito`, región cercana, tiers gratuitos)
+
+Nombres: `rg-fulbito`, `sql-fulbito` (base `fulbito`), `app-fulbito-api`, `kv-fulbito`, service connection `sc-fulbito` e imagen `<usuario-dockerhub>/fulbito-api`.
+
+> ⚠️ `sql-fulbito`, `app-fulbito-api` y `kv-fulbito` forman parte de una URL pública (`*.database.windows.net`, `*.azurewebsites.net`, `*.vault.azure.net`), así que tienen que ser **únicos en todo Azure**. Si al crearlos ya están tomados, agregar un sufijo corto (ej. `kv-fulbito-ra`) y actualizar los docs y el pipeline con el nombre real.
 
 4. **Azure SQL Database** con la oferta gratuita (serverless con auto-pausa). Reglas de firewall y autenticación con Microsoft Entra.
 5. **App Service para contenedores** (Linux, plan F1 o B1) que corre la imagen de la API, con *health check* en `/health`. Alternativa: Azure Container Apps.
