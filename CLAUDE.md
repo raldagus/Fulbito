@@ -58,7 +58,7 @@ Cada 2 o 3 ciclos, proponé **"tu turno"**: ella escribe el test (o el código) 
 
 ```
 backend/
-  Fulbito.sln
+  Fulbito.slnx
   src/
     Fulbito.Domain/          # entidades y reglas, sin dependencias externas
     Fulbito.Application/     # casos de uso (handlers), DTOs, interfaces
