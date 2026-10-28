@@ -1,4 +1,4 @@
-# Repaso · Lo que hay que saber y cómo se aplica en Reservas de Canchas
+# Repaso · Lo que hay que saber y cómo se aplica en Fulbito
 
 Cada sección tiene tres partes:
 
@@ -899,9 +899,9 @@ Son lentos, más frágiles y cuando fallan cuesta encontrar la causa. La pirámi
 **Comandos que hay que manejar**
 
 ```bash
-docker build -t reservas-api ./backend          # construir una imagen
+docker build -t fulbito-api ./backend           # construir una imagen
 docker images                                   # listar imágenes y tamaños
-docker run -d -p 5000:8080 --name api reservas-api
+docker run -d -p 5000:8080 --name api fulbito-api
 docker ps / docker ps -a                        # contenedores corriendo / todos
 docker logs -f api                              # ver logs
 docker exec -it api sh                          # entrar a un contenedor
@@ -918,15 +918,15 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Primero solo los .csproj → esta capa se cachea mientras no cambien las dependencias
-COPY src/ReservasCanchas.Domain/*.csproj         src/ReservasCanchas.Domain/
-COPY src/ReservasCanchas.Application/*.csproj    src/ReservasCanchas.Application/
-COPY src/ReservasCanchas.Infrastructure/*.csproj src/ReservasCanchas.Infrastructure/
-COPY src/ReservasCanchas.Api/*.csproj            src/ReservasCanchas.Api/
-RUN dotnet restore src/ReservasCanchas.Api/ReservasCanchas.Api.csproj
+COPY src/Fulbito.Domain/*.csproj         src/Fulbito.Domain/
+COPY src/Fulbito.Application/*.csproj    src/Fulbito.Application/
+COPY src/Fulbito.Infrastructure/*.csproj src/Fulbito.Infrastructure/
+COPY src/Fulbito.Api/*.csproj            src/Fulbito.Api/
+RUN dotnet restore src/Fulbito.Api/Fulbito.Api.csproj
 
 # Después el código
 COPY src/ src/
-RUN dotnet publish src/ReservasCanchas.Api -c Release -o /app --no-restore
+RUN dotnet publish src/Fulbito.Api -c Release -o /app --no-restore
 
 # Etapa 2: imagen final, solo runtime
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
@@ -936,7 +936,7 @@ COPY --from=build /app .
 # (en un Dockerfile los comentarios van en su propia línea)
 USER $APP_UID
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "ReservasCanchas.Api.dll"]
+ENTRYPOINT ["dotnet", "Fulbito.Api.dll"]
 ```
 
 **`docker-compose.yml` de la app completa** (desde la Etapa 6)
@@ -960,7 +960,7 @@ services:
     build: ./backend
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__Default: "Server=sql,1433;Database=reservas;User Id=sa;Password=${SQL_PASSWORD};TrustServerCertificate=True"
+      ConnectionStrings__Default: "Server=sql,1433;Database=fulbito;User Id=sa;Password=${SQL_PASSWORD};TrustServerCertificate=True"
     ports: ["5000:8080"]
     depends_on:
       sql: { condition: service_healthy }
@@ -1076,15 +1076,15 @@ El BackgroundService vive toda la aplicación (Singleton) y el DbContext es Scop
 Connection string de producción, **sin contraseña** (se configura en el App Service):
 
 ```
-Server=tcp:sql-reservas-canchas.database.windows.net,1433;Database=reservas;Authentication=Active Directory Default;Encrypt=True;
+Server=tcp:sql-fulbito.database.windows.net,1433;Database=fulbito;Authentication=Active Directory Default;Encrypt=True;
 ```
 
 Permisos mínimos en Azure SQL para la identidad de la API (se ejecuta una vez, como admin de Entra):
 
 ```sql
-CREATE USER [app-reservas-api] FROM EXTERNAL PROVIDER;
-ALTER ROLE db_datareader ADD MEMBER [app-reservas-api];
-ALTER ROLE db_datawriter ADD MEMBER [app-reservas-api];
+CREATE USER [app-fulbito-api] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [app-fulbito-api];
+ALTER ROLE db_datawriter ADD MEMBER [app-fulbito-api];
 -- Las migraciones las corre el pipeline con otra identidad que sí tiene db_ddladmin
 ```
 
@@ -1098,7 +1098,7 @@ builder.Services.AddDbContext<AppDbContext>(o =>
 builder.Services.AddOpenTelemetry().UseAzureMonitor(); // Application Insights
 ```
 
-Secretos con **Key Vault references**: en la configuración del App Service, la variable `Jwt__Clave` toma el valor `@Microsoft.KeyVault(SecretUri=https://kv-reservas.vault.azure.net/secrets/jwt-clave/)`. El código sigue leyendo `builder.Configuration["Jwt:Clave"]` como siempre.
+Secretos con **Key Vault references**: en la configuración del App Service, la variable `Jwt__Clave` toma el valor `@Microsoft.KeyVault(SecretUri=https://kv-fulbito.vault.azure.net/secrets/jwt-clave/)`. El código sigue leyendo `builder.Configuration["Jwt:Clave"]` como siempre.
 
 <details><summary>¿Qué es una Managed Identity y por qué es mejor que una contraseña en la connection string?</summary>
 
@@ -1181,7 +1181,7 @@ stages:
       inputs: { summaryFileLocation: '**/coverage.cobertura.xml' }
     - script: |
         dotnet tool restore
-        dotnet ef migrations bundle -p backend/src/ReservasCanchas.Infrastructure -s backend/src/ReservasCanchas.Api \
+        dotnet ef migrations bundle -p backend/src/Fulbito.Infrastructure -s backend/src/Fulbito.Api \
           -o $(Build.ArtifactStagingDirectory)/migraciones/efbundle --self-contained -r linux-x64
       displayName: Bundle de migraciones
     - publish: $(Build.ArtifactStagingDirectory)/migraciones
@@ -1192,7 +1192,7 @@ stages:
       inputs:
         command: buildAndPush
         containerRegistry: sc-dockerhub    # service connection al registro
-        repository: $(dockerUser)/reservas-canchas-api
+        repository: $(dockerUser)/fulbito-api
         Dockerfile: backend/Dockerfile
         buildContext: backend
         tags: |
@@ -1227,7 +1227,7 @@ stages:
           - task: AzureCLI@2
             displayName: Migraciones
             inputs:
-              azureSubscription: sc-reservas-canchas
+              azureSubscription: sc-fulbito
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -1235,9 +1235,9 @@ stages:
                 $(Pipeline.Workspace)/migraciones/efbundle --connection "$(sqlConnection)"
           - task: AzureWebAppContainer@1    # el App Service pasa a la imagen nueva
             inputs:
-              azureSubscription: sc-reservas-canchas
-              appName: app-reservas-api
-              containers: docker.io/$(dockerUser)/reservas-canchas-api:$(Build.BuildId)
+              azureSubscription: sc-fulbito
+              appName: app-fulbito-api
+              containers: docker.io/$(dockerUser)/fulbito-api:$(Build.BuildId)
           - task: AzureStaticWebApp@0
             inputs:
               workingDirectory: $(Pipeline.Workspace)/web

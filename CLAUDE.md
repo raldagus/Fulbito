@@ -1,4 +1,4 @@
-# CLAUDE.md — Reservas de Canchas (modo tutor)
+# CLAUDE.md — Fulbito · Reservas de canchas (modo tutor)
 
 Este repo es un proyecto de aprendizaje. Lo construye **Agustina**, desarrolladora full-stack junior, junto con Claude Code.
 El objetivo no es solo terminar la app: es que ella **entienda cada cambio** y pueda explicarlo en una entrevista.
@@ -30,7 +30,7 @@ Seguí este ciclo **siempre**, un paso del roadmap a la vez:
 4. **Un solo cambio chico.** Un archivo o un bloque acotado. Mostrá el diff y explicá las líneas que no son obvias. Nunca encadenes varios cambios sin pausa.
 5. **Correr y mostrar.** `dotnet build`, `dotnet test`, `npm test`, lo que corresponda. Mostrá la salida relevante.
 6. **Pregunta técnica tipo entrevista.** 1 o 2 sobre lo que acabamos de hacer. Esperá la respuesta y dale feedback: qué estuvo bien, qué faltó y cómo lo diría una persona senior.
-7. **Commit.** Proponé el mensaje (Conventional Commits, en español). **No hagas commit sin su OK.**
+7. **Commit.** Proponé el mensaje (Conventional Commits, en español) y esperá que escriba literalmente **"OK commit"**. "Sigamos", "dale", "listo" u "OK" a secas **no** autorizan un commit. El push también necesita que lo pida.
 8. **Actualizar `docs/PROGRESO.md`.** Tildar el paso, anotar dudas y registrar las preguntas que respondió mal.
 
 Después del paso 8, preguntá: "¿Seguimos con el próximo paso o querés repasar algo?"
@@ -58,17 +58,17 @@ Cada 2 o 3 ciclos, proponé **"tu turno"**: ella escribe el test (o el código) 
 
 ```
 backend/
-  ReservasCanchas.sln
+  Fulbito.slnx
   src/
-    ReservasCanchas.Domain/          # entidades y reglas, sin dependencias externas
-    ReservasCanchas.Application/     # casos de uso (handlers), DTOs, interfaces
-    ReservasCanchas.Infrastructure/  # EF Core + SQL Server, repositorios, Identity
-    ReservasCanchas.Api/             # controllers, auth, ProblemDetails, OpenAPI
+    Fulbito.Domain/          # entidades y reglas, sin dependencias externas
+    Fulbito.Application/     # casos de uso (handlers), DTOs, interfaces
+    Fulbito.Infrastructure/  # EF Core + SQL Server, repositorios, Identity
+    Fulbito.Api/             # controllers, auth, ProblemDetails, OpenAPI
   tests/
-    ReservasCanchas.Domain.Tests/        # xUnit + Shouldly (TDD)
-    ReservasCanchas.Application.Tests/   # xUnit + NSubstitute + FakeTimeProvider
-    ReservasCanchas.Api.IntegrationTests/# WebApplicationFactory + Testcontainers (SQL Server) + Respawn
-    ReservasCanchas.Specs/               # Reqnroll (BDD, features en español)
+    Fulbito.Domain.Tests/        # xUnit + Shouldly (TDD)
+    Fulbito.Application.Tests/   # xUnit + NSubstitute + FakeTimeProvider
+    Fulbito.Api.IntegrationTests/# WebApplicationFactory + Testcontainers (SQL Server) + Respawn
+    Fulbito.Specs/               # Reqnroll (BDD, features en español)
 frontend/
   # Vite + React + TypeScript + Tailwind + React Router + TanStack Query
   # React Hook Form + Zod · Vitest + Testing Library + MSW · Playwright (e2e/)
@@ -103,8 +103,8 @@ docker compose up --build                  # app completa (desde la Etapa 6)
 docker compose logs -f api                 # ver logs de un servicio
 dotnet build backend
 dotnet test backend
-dotnet ef migrations add <Nombre> -p backend/src/ReservasCanchas.Infrastructure -s backend/src/ReservasCanchas.Api
-dotnet ef database update -p backend/src/ReservasCanchas.Infrastructure -s backend/src/ReservasCanchas.Api
+dotnet ef migrations add <Nombre> -p backend/src/Fulbito.Infrastructure -s backend/src/Fulbito.Api
+dotnet ef database update -p backend/src/Fulbito.Infrastructure -s backend/src/Fulbito.Api
 cd frontend && npm run dev | npm test | npx playwright test
 ```
 

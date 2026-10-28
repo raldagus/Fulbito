@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Fulbito.Api/Fulbito.Api.csproj" />
+    <Project Path="src/Fulbito.Application/Fulbito.Application.csproj" />
+    <Project Path="src/Fulbito.Domain/Fulbito.Domain.csproj" />
+    <Project Path="src/Fulbito.Infrastructure/Fulbito.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Fulbito.Api.IntegrationTests/Fulbito.Api.IntegrationTests.csproj" />
+    <Project Path="tests/Fulbito.Application.Tests/Fulbito.Application.Tests.csproj" />
+    <Project Path="tests/Fulbito.Domain.Tests/Fulbito.Domain.Tests.csproj" />
+    <Project Path="tests/Fulbito.Specs/Fulbito.Specs.csproj" />
+  </Folder>
+</Solution>
