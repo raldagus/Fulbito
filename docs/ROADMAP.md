@@ -1,6 +1,6 @@
 # Roadmap del proyecto — Fulbito · Reservas de canchas
 
-App para reservar canchas de pádel y fútbol 5, desplegada en Azure y gestionada con Azure DevOps. Hay tres roles:
+App para reservar canchas de pádel y fútbol 5, gestionada con GitHub Projects y con CI en GitHub Actions. Hay tres roles:
 
 - **Jugador:** busca un horario libre, reserva, paga la seña y puede cancelar.
 - **Dueño:** administra su complejo, sus canchas y precios, confirma señas y ve la agenda.
@@ -38,13 +38,13 @@ Todo test y toda feature Gherkin sale de esta lista. Si aparece una regla nueva,
 2. Copiar este kit: `CLAUDE.md`, `docs/`, `.claude/commands/`.
 3. `docker-compose.yml` con SQL Server 2022 y verificar la conexión desde SSMS o la extensión mssql de VS Code (`localhost,1433`, usuario `sa`, *Trust server certificate*).
 4. Crear la solución y los 8 proyectos vacíos (4 de `src`, 4 de `tests`) con sus referencias.
-5. **Azure DevOps:** crear la organización y el proyecto `Fulbito` (proceso Agile o Scrum) y conectar el repo de GitHub.
-6. **Pedir ya el grant gratuito de parallel jobs** de Azure Pipelines. Se tramita con un formulario de Microsoft y puede tardar unos días. Mientras tanto, se puede usar un agente self-hosted en la PC.
-7. **Cuenta de Azure:** crear la cuenta gratuita y, **antes que nada**, una alerta de presupuesto (Cost Management → Budgets) de unos pocos dólares.
-8. Primer commit y primer PR, aunque sea trivial, para practicar el flujo.
+5. **GitHub Project:** crear el Project `Fulbito` (vista de tablero), vinculado al repo, con los campos `Status` e `Iteration` (sprints de 2 semanas).
+6. Primer commit y primer PR, aunque sea trivial, para practicar el flujo.
 
-- **Repaso:** §1 Git · §4 Arquitectura · §24 Azure · §25 Azure DevOps
-- **Listo cuando:** `dotnet build backend` compila, `dotnet test backend` corre (0 tests), SQL Server levanta con Docker, el proyecto de Azure DevOps existe y la alerta de presupuesto está creada.
+> **Cambio de plan:** Azure DevOps exige una suscripción de Azure con tarjeta para crear la organización, así que usamos **GitHub Projects + Issues** en lugar de Azure Boards y **GitHub Actions** en lugar de Azure Pipelines (en repos públicos es gratis y no hace falta pedir ningún grant). Azure DevOps y el deploy en Azure (§24) pueden sumarse más adelante; si se suma Azure, lo primero es crear una alerta de presupuesto (Cost Management → Budgets).
+
+- **Repaso:** §1 Git · §4 Arquitectura · §25 GitHub Projects y Actions
+- **Listo cuando:** `dotnet build backend` compila, `dotnet test backend` corre (0 tests), SQL Server levanta con Docker y el GitHub Project existe vinculado al repo.
 
 ---
 
@@ -57,15 +57,15 @@ Todo test y toda feature Gherkin sale de esta lista. Si aparece una regla nueva,
 3. Pasar las reglas R1, R4, R5 y R8 a features Gherkin en `docs/features/`. No se ejecutan todavía.
 4. Bocetos a mano o en Figma de 4 pantallas: grilla de turnos, confirmar reserva, mis reservas y agenda del dueño.
 5. Diagrama entidad-relación: Complejo, Cancha, Reserva, TurnoOcupado, Bloqueo, Usuario.
-6. **Azure Boards:**
-   - cada etapa del roadmap como un *Epic*
-   - cada historia como un *User Story*, con sus criterios de aceptación
-   - los pasos como *Tasks*
-   - sprints de 2 semanas
-   - vincular GitHub para que `AB#<id>` en un commit enlace el work item
+6. **GitHub Project + Issues:**
+   - cada etapa del roadmap como un *Milestone* (≈ Epic)
+   - cada historia como un *Issue*, con sus criterios de aceptación en la descripción (≈ User Story)
+   - los pasos como *sub-issues* o una lista de tareas dentro del issue (≈ Tasks)
+   - sprints de 2 semanas con el campo `Iteration` del Project
+   - `#<número>` en un commit enlaza el issue, y `Closes #<número>` en el PR lo cierra al mergear
 
-- **Repaso:** §14 BDD y Gherkin · §19 UX/UI · §25 Azure DevOps
-- **Listo cuando:** las features se leen como algo que entendería el dueño de una cancha, sin términos técnicos, y el primer sprint está planificado en Boards.
+- **Repaso:** §14 BDD y Gherkin · §19 UX/UI · §25 GitHub Projects y Actions
+- **Listo cuando:** las features se leen como algo que entendería el dueño de una cancha, sin términos técnicos, y el primer sprint está planificado en el GitHub Project.
 
 ---
 
@@ -135,7 +135,7 @@ Orden sugerido. Cada regla es uno o más ciclos 🔴🟢🔵:
 5. Medir la cobertura con coverlet y ReportGenerator.
 
 - **Repaso:** §13 Tests de integración · §10 concurrencia
-- **Listo cuando:** `dotnet test` levanta el contenedor solo y todo pasa en verde dos veces seguidas. Desde ahora, el pipeline de Azure (§25) corre estos tests en cada PR.
+- **Listo cuando:** `dotnet test` levanta el contenedor solo y todo pasa en verde dos veces seguidas. Desde ahora, el workflow de CI de GitHub Actions (§25) corre estos tests en cada PR.
 
 ---
 
@@ -228,23 +228,25 @@ Cada pantalla se hace con su test al lado; cuando se pueda, el test primero.
 
 ---
 
-## Etapa 12 · Azure: deploy y Azure Pipelines [paso 16]
+## Etapa 12 · CI con GitHub Actions (y deploy en Azure, más adelante) [paso 16]
 
-**Objetivo:** la app en producción en Azure, con un pipeline que no deja pasar nada sin tests.
+**Objetivo:** un CI que no deja pasar nada sin tests. El deploy en Azure queda para más adelante, porque requiere una suscripción de Azure con tarjeta.
 
-En la práctica, el pipeline de CI (pasos 1–3) conviene armarlo apenas termine la Etapa 5, cuando ya hay tests que valga la pena correr. Esta etapa completa el deploy.
+En la práctica, el CI (pasos 1–3) conviene armarlo apenas termine la Etapa 5, cuando ya hay tests que valga la pena correr.
 
-**Pipeline (Azure Pipelines)**
+**CI (GitHub Actions)**
 
-1. `azure-pipelines.yml`, stage **CI**: tests de back (con Testcontainers) y de front, resultados y cobertura publicados en la pestaña *Tests*, artefactos `migraciones` y `web`, y en `main` **build y push de la imagen Docker de la API** con el número de build como tag.
-2. GitHub: branch protection en `main` exigiendo que el check de Azure Pipelines pase.
-3. Badge del pipeline en el README.
+1. `.github/workflows/ci.yml`: jobs de tests de back (con Testcontainers, el runner `ubuntu-latest` trae Docker) y de front, con resultados y cobertura subidos como artefactos, y en `main` **build y push de la imagen Docker de la API** a Docker Hub con el número de corrida como tag.
+2. GitHub: en el ruleset de `main`, exigir que los checks del CI pasen (*required status checks*).
+3. Badge del workflow en el README.
+
+**Más adelante (opcional): deploy en Azure.** Requiere suscripción de Azure. Antes de crear cualquier recurso: alerta de presupuesto (Cost Management → Budgets) de unos pocos dólares. Si además se quiere usar Azure DevOps, Boards y Pipelines reemplazan a Projects y Actions con los mismos conceptos (tabla de equivalencias en §25).
 
 **Recursos en Azure** (todo en un resource group `rg-fulbito`, región cercana, tiers gratuitos)
 
-Nombres: `rg-fulbito`, `sql-fulbito` (base `fulbito`), `app-fulbito-api`, `kv-fulbito`, service connection `sc-fulbito` e imagen `<usuario-dockerhub>/fulbito-api`.
+Nombres: `rg-fulbito`, `sql-fulbito` (base `fulbito`), `app-fulbito-api`, `kv-fulbito` e imagen `<usuario-dockerhub>/fulbito-api`. Si se usa Azure DevOps, la service connection se llama `sc-fulbito`.
 
-> ⚠️ `sql-fulbito`, `app-fulbito-api` y `kv-fulbito` forman parte de una URL pública (`*.database.windows.net`, `*.azurewebsites.net`, `*.vault.azure.net`), así que tienen que ser **únicos en todo Azure**. Si al crearlos ya están tomados, agregar un sufijo corto (ej. `kv-fulbito-ra`) y actualizar los docs y el pipeline con el nombre real.
+> ⚠️ `sql-fulbito`, `app-fulbito-api` y `kv-fulbito` forman parte de una URL pública (`*.database.windows.net`, `*.azurewebsites.net`, `*.vault.azure.net`), así que tienen que ser **únicos en todo Azure**. Si al crearlos ya están tomados, agregar un sufijo corto (ej. `kv-fulbito-ra`) y actualizar los docs y el workflow con el nombre real.
 
 4. **Azure SQL Database** con la oferta gratuita (serverless con auto-pausa). Reglas de firewall y autenticación con Microsoft Entra.
 5. **App Service para contenedores** (Linux, plan F1 o B1) que corre la imagen de la API, con *health check* en `/health`. Alternativa: Azure Container Apps.
@@ -252,25 +254,25 @@ Nombres: `rg-fulbito`, `sql-fulbito` (base `fulbito`), `app-fulbito-api`, `kv-fu
 7. **Key Vault** para la clave del JWT, y **Managed Identity** del App Service para leer Key Vault y conectarse a Azure SQL **sin contraseñas**.
 8. **Application Insights**: logs, errores, tiempos de respuesta y un *availability test* sobre `/health` (reemplaza a UptimeRobot).
 
-**Deploy (Azure Pipelines)**
+**Deploy (GitHub Actions)**
 
-9. *Service connection* a Azure (workload identity federation, sin secretos).
-10. Stage **Deploy**, solo desde `main`:
+9. Login a Azure con **OIDC** (`azure/login` con una *federated credential*): el workflow obtiene tokens de corta duración y no guarda secretos.
+10. Job **deploy**, solo desde `main` y después del CI:
     - migraciones con un *EF migrations bundle*
-    - el App Service pasa a la imagen nueva (`AzureWebAppContainer`)
+    - el App Service pasa a la imagen nueva (`azure/webapps-deploy`)
     - deploy del front a Static Web Apps
-11. *Environment* `produccion` con aprobación manual: el deploy espera un OK.
+11. *Environment* `produccion` con *required reviewers*: el deploy espera un OK manual.
 12. CORS de la API solo para el dominio de Static Web Apps.
 
-- **Repaso:** §22 Docker · §24 Azure · §25 Azure DevOps
-- **Listo cuando:** un PR con un test roto no se puede mergear, un merge a `main` llega a producción después de la aprobación, la API no tiene ninguna contraseña en su configuración y Application Insights muestra los requests.
+- **Repaso:** §22 Docker · §25 GitHub Projects y Actions · §24 Azure (si se suma el deploy)
+- **Listo cuando:** un PR con un test roto no se puede mergear y cada merge a `main` publica la imagen de la API en Docker Hub. Con el deploy en Azure: un merge a `main` llega a producción después de la aprobación, la API no tiene ninguna contraseña en su configuración y Application Insights muestra los requests.
 
 ---
 
 ## Etapa 13 · Extras (elegir 1 o 2)
 
 - **Liberar señas vencidas (R7)** con un `BackgroundService` o, en versión Azure, con una **Azure Function con Timer Trigger** cada minuto. En los dos casos la lógica se testea con `FakeTimeProvider`.
-- **Infraestructura como código con Bicep:** describir en `infra/main.bicep` todos los recursos de la Etapa 12 y desplegarlos desde el pipeline. Así el entorno se puede recrear desde cero.
+- **Infraestructura como código con Bicep:** describir en `infra/main.bicep` todos los recursos de Azure de la Etapa 12 y desplegarlos desde GitHub Actions (requiere el deploy en Azure). Así el entorno se puede recrear desde cero.
 - **Recordatorios por email** el día anterior con Azure Communication Services.
 - **Grilla en tiempo real** con SignalR: si alguien reserva, la celda se ocupa en otras pantallas.
 - **Turnos fijos semanales** ("todos los martes 20:00"): es una buena regla nueva para hacer TDD sin ayuda.
@@ -283,9 +285,9 @@ Nombres: `rg-fulbito`, `sql-fulbito` (base `fulbito`), `app-fulbito-api`, `kv-fu
 
 ## Etapa 14 · Portfolio y entrevista
 
-1. README con capturas, un GIF del flujo, el diagrama de arquitectura, cómo correrlo y los links de producción.
-2. Sección "Decisiones técnicas": por qué la tabla de slots con clave primaria compuesta, por qué el Result pattern, por qué TimeProvider y por qué Managed Identity.
-2b. Diagrama de la arquitectura en Azure (App Service, Static Web Apps, Azure SQL, Key Vault, Application Insights) y captura del pipeline y del tablero de Boards.
+1. README con capturas, un GIF del flujo, el diagrama de arquitectura, cómo correrlo y, si hay deploy, los links de producción.
+2. Sección "Decisiones técnicas": por qué la tabla de slots con clave primaria compuesta, por qué el Result pattern, por qué TimeProvider y (si se sumó Azure) por qué Managed Identity.
+2b. Captura del workflow de GitHub Actions y del tablero del GitHub Project. Si se sumó el deploy, diagrama de la arquitectura en Azure (App Service, Static Web Apps, Azure SQL, Key Vault, Application Insights).
 3. Usuarios demo (jugador y dueño) para quien revise el proyecto.
 4. Correr `/entrevista` varias veces y practicar la explicación del proyecto en 2 minutos.
 

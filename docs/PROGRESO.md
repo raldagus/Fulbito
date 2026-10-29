@@ -3,10 +3,9 @@
 Claude Code actualiza este archivo al final de cada paso. Vos también podés editarlo.
 
 **Etapa actual:** 0 · Preparación
-**Próximo paso:** Etapa 1 · 1.1 Historias de usuario · **pendientes:** 0.5, 0.6 y 0.7 (Azure bloqueado, ver notas)
+**Próximo paso:** 0.5 Crear el GitHub Project `Fulbito` · después, Etapa 1 · 1.1 Historias de usuario
 
-**Azure Boards:** (pegar acá la URL del proyecto)
-**Grant de parallel jobs pedido el:** (fecha)
+**GitHub Project:** (pegar acá la URL del Project)
 
 ## Etapas
 
@@ -22,7 +21,7 @@ Claude Code actualiza este archivo al final de cada paso. Vos también podés ed
 - [ ] 9 · Base del frontend
 - [ ] 10 · Funcionalidades del frontend
 - [ ] 11 · Tests E2E
-- [ ] 12 · Azure: deploy y Azure Pipelines
+- [ ] 12 · CI con GitHub Actions (deploy en Azure, más adelante)
 - [ ] 13 · Extras
 - [ ] 14 · Portfolio y entrevista
 
@@ -33,10 +32,8 @@ Claude Code actualiza este archivo al final de cada paso. Vos también podés ed
 - [x] 0.2 Kit en GitHub (CLAUDE.md, docs/, .claude/, compose, .env.example) por rama `etapa-0-preparacion` + PR · REPASO §1 · commit 16f21fd
 - [x] 0.3 SQL Server 2022 en Docker; conexión desde SSMS a `localhost,1433` con `sa` (`@@VERSION` → Developer Edition on Linux) · REPASO §22 · commit 3ad6a76
 - [x] 0.4 Solución `backend/Fulbito.slnx` + 4 proyectos de `src` (Application→Domain, Infrastructure→Application, Api→Application+Infrastructure, sin ejemplos de plantilla) y 4 de `tests` con xUnit v3 + VSTest en net10.0 (Domain.Tests→Domain, Application.Tests→Application, Api.IntegrationTests→Api, Specs→Application). `dotnet build` 0 warnings, `dotnet test` 0 tests con exit code 0 · REPASO §4 §6 · commits 76b7ca2, ccd9882
-- [ ] 0.5 Azure DevOps (organización y proyecto `Fulbito`, conectar GitHub) · **pendiente**: Microsoft bloqueó la creación de la cuenta
-- [ ] 0.6 Pedir el grant gratuito de parallel jobs de Azure Pipelines · **pendiente** (depende del 0.5)
-- [ ] 0.7 Cuenta gratuita de Azure + alerta de presupuesto · **pendiente** (mismo bloqueo)
-- [x] 0.8 Flujo rama → PR → merge practicado con los PRs #1 y #2 (docs) y el PR #3 (`etapa-0-preparacion`: 0.3–0.4, 6 commits) con *Create a merge commit* · REPASO §1 · merge d308f96
+- [ ] 0.5 GitHub Project `Fulbito` vinculado al repo, con `Status` e `Iteration` (reemplaza a Azure DevOps, el grant de Pipelines y la cuenta de Azure) · **pendiente**
+- [x] 0.6 (antes 0.8) Flujo rama → PR → merge practicado con los PRs #1 y #2 (docs) y el PR #3 (`etapa-0-preparacion`: 0.3–0.4, 6 commits) con *Create a merge commit* · REPASO §1 · merge d308f96
 
 ## Preguntas para repasar
 
@@ -56,7 +53,7 @@ Preguntas de entrevista que costaron. `/siguiente` y `/entrevista` las vuelven a
 ## Dudas y notas
 
 <!-- Lo que quedó pendiente de entender o investigar -->
-- **Azure bloqueado (2026-10-26):** al crear la cuenta de Microsoft apareció "Account creation has been blocked" (actividad inusual). Reintentar desde otra red. Al destrabarlo: hacer 0.5 → 0.6 (pedir el grant cuanto antes, tarda días) → 0.7 (alerta de presupuesto **antes** de crear cualquier recurso). Bloquea el cierre de la Etapa 0 y el uso de `AB#<id>` desde la Etapa 1.
+- **Cambio de plan (2026-10-29):** Microsoft bloqueó la creación de la cuenta ("Account creation has been blocked", 2026-10-26) y además Azure DevOps exige una suscripción de Azure con tarjeta para crear la organización. Se reemplaza Azure Boards por **GitHub Projects + Issues** (commits con `#<issue>` en vez de `AB#<id>`) y Azure Pipelines por **GitHub Actions** (gratis en repos públicos, sin grant). Los pasos 0.5–0.7 se reemplazan por el 0.5 (GitHub Project) y el viejo 0.8 pasa a ser 0.6. Azure DevOps y el deploy en Azure pueden sumarse más adelante; si se suma Azure, lo primero es la alerta de presupuesto.
 - Identidad de Git: autor = `user.name`/`user.email` de la config global (`raldagus <raldagus98@gmail.com>`); push = cuenta `raldagus` del Git Credential Manager. Verificar que ese mail esté agregado en GitHub (Settings → Emails) para que los commits se vinculen al perfil.
 - Contraseña de SQL cambiada en `.env` antes de crear el volumen `sqldata` → la clave nueva es la vigente.
 - En la PC hay **otro SQL Server en Windows** (`MSSQLSERVER`, 16.0.1000.6) con TCP deshabilitado (solo DAC en 127.0.0.1:1434), así que no choca con el 1433 de Docker. En SSMS usar siempre `localhost,1433` (o `tcp:localhost,1433`): con `localhost` o `.` a secas puede entrar por Shared Memory a la instancia de Windows. Chequeo: `@@VERSION` dice "on Linux" (Docker) u "on Windows" (local).

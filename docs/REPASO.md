@@ -15,7 +15,7 @@ El código es orientativo: Claude Code lo va construyendo con vos paso a paso y 
 | [1 Git](#1-git-y-flujo-de-trabajo) | [9 EF Core](#9-ef-core) | [5 TDD](#5-tdd) | [16 React + TS](#16-react-con-typescript) | [22 Docker](#22-docker) |
 | [2 C# moderno](#2-c-moderno) | [10 SQL Server y concurrencia](#10-sql-server-y-concurrencia) | [6 xUnit](#6-xunit-y-shouldly) | [17 TanStack Query](#17-tanstack-query) | [23 Extras](#23-extras) |
 | [3 POO y SOLID](#3-poo-y-solid-en-el-dominio) | [11 Result pattern](#11-result-pattern) | [7 Mocks](#7-mocks-con-nsubstitute) | [18 Formularios](#18-formularios-con-react-hook-form--zod) | [24 Azure](#24-azure-servicios-del-proyecto) |
-| [4 Arquitectura](#4-arquitectura-en-capas-clean-architecture) | [12 ASP.NET Core](#12-aspnet-core-web-api) | [13 Integración](#13-tests-de-integración) | [19 UX/UI](#19-uxui-y-accesibilidad) | [25 Azure DevOps](#25-azure-devops-boards-y-pipelines) |
+| [4 Arquitectura](#4-arquitectura-en-capas-clean-architecture) | [12 ASP.NET Core](#12-aspnet-core-web-api) | [13 Integración](#13-tests-de-integración) | [19 UX/UI](#19-uxui-y-accesibilidad) | [25 GitHub Projects y Actions](#25-github-projects-issues-y-actions) |
 | [8 Tiempo](#8-manejo-del-tiempo) | [15 Seguridad](#15-seguridad) | [14 BDD](#14-bdd-con-gherkin-y-reqnroll) | [20 Testing React](#20-testing-en-react) | |
 | | | [21 Playwright](#21-e2e-con-playwright) | | |
 
@@ -999,7 +999,7 @@ COPY --from=build /app/dist /usr/share/nginx/html
 - **CI:** cada push o PR corre build y tests.
 - **Entrega continua:** siempre queda listo para desplegar, con un botón.
 - **Despliegue continuo:** se despliega solo.
-- **Build once, deploy many:** la misma imagen que pasó los tests es la que llega a producción. El pipeline está en §25.
+- **Build once, deploy many:** la misma imagen que pasó los tests es la que llega a producción. El workflow de CI está en §25.
 
 <details><summary>¿Diferencia entre imagen y contenedor?</summary>
 
@@ -1051,6 +1051,8 @@ El BackgroundService vive toda la aplicación (Singleton) y el DbContext es Scop
 
 ## 24. Azure: servicios del proyecto
 
+> **Más adelante (opcional):** el deploy en Azure quedó para después, porque requiere una suscripción de Azure con tarjeta (ver §25). Esta sección queda como referencia para cuando se sume. Antes de crear cualquier recurso: alerta de presupuesto.
+
 **Qué tenés que saber**
 
 - **Jerarquía:** suscripción (donde se factura) → *resource group* (carpeta lógica, se borra todo junto) → recursos.
@@ -1085,7 +1087,7 @@ Permisos mínimos en Azure SQL para la identidad de la API (se ejecuta una vez, 
 CREATE USER [app-fulbito-api] FROM EXTERNAL PROVIDER;
 ALTER ROLE db_datareader ADD MEMBER [app-fulbito-api];
 ALTER ROLE db_datawriter ADD MEMBER [app-fulbito-api];
--- Las migraciones las corre el pipeline con otra identidad que sí tiene db_ddladmin
+-- Las migraciones las corre el workflow de deploy con otra identidad que sí tiene db_ddladmin
 ```
 
 `Program.cs`:
@@ -1117,152 +1119,140 @@ Por dos *cold starts*: el App Service F1 se descarga si no tiene uso, y Azure SQ
 
 ---
 
-## 25. Azure DevOps: Boards y Pipelines
+## 25. GitHub: Projects, Issues y Actions
+
+> **Cambio de plan:** el proyecto iba a usar Azure DevOps (Boards y Pipelines), pero crear la organización exige una suscripción de Azure con tarjeta. Usamos **GitHub Projects + Issues** para la gestión y **GitHub Actions** para el CI. Azure DevOps y el deploy en Azure (§24) pueden sumarse más adelante: los conceptos son casi los mismos (ver la tabla de equivalencias al final de la sección).
 
 **Qué tenés que saber**
 
-- **Azure Boards**
-  - Jerarquía (proceso Agile): Epic → Feature → User Story → Task. En el proceso Scrum, el User Story se llama *Product Backlog Item*.
-  - **Sprints:** iteraciones de 2 semanas. Se planifica qué historias entran y se estima en *story points*.
-  - **Definition of Done** del proyecto: tests en verde, PR aprobado, pipeline pasando y `PROGRESO.md` actualizado.
-  - Escribir `AB#123` en un commit o PR de GitHub lo vincula al work item.
-- **Repos:** el código queda en GitHub para que sea visible en el portfolio. Azure Pipelines y Boards funcionan igual conectados a GitHub.
-- **Azure Pipelines, conceptos**
+- **GitHub Issues + Projects (gestión)**
+  - **Issue:** una unidad de trabajo (historia, tarea o bug), con número (`#12`), labels, responsable y milestone.
+  - Jerarquía que usamos: **Milestone** por etapa (≈ Epic) → **Issue** por historia de usuario, con los criterios de aceptación en la descripción → **sub-issues** o una lista de tareas para los pasos.
+  - **Project:** un tablero o tabla sobre los issues, con campos propios: `Status` (Todo / In progress / Done), `Iteration` (sprints de 2 semanas) y, si se quiere, un campo numérico para *story points*.
+  - **Definition of Done** del proyecto: tests en verde, PR revisado, CI pasando y `PROGRESO.md` actualizado.
+  - Escribir `#12` en un commit o PR lo vincula al issue. `Closes #12` (o `Fixes`, `Resolves`) en la descripción del PR lo cierra solo cuando el PR se mergea en `main`.
+- **GitHub Actions (CI), conceptos**
 
   | Concepto | Qué es |
   |---|---|
-  | `trigger` / `pr` | Cuándo corre el pipeline |
-  | Stage | Etapa grande (CI, Deploy) |
-  | Job | Corre en un agente |
-  | Step / task | Un paso concreto |
-  | Agente | Microsoft-hosted o self-hosted (tu PC) |
-  | Artefacto | Lo compilado que pasa del CI al deploy |
-  | Environment | Destino del deploy, con aprobaciones |
-  | Service connection | Permiso del pipeline sobre Azure, idealmente con *workload identity federation* (sin secretos) |
-  | Variable group | Variables compartidas, que pueden venir de Key Vault |
+  | Workflow | Un archivo YAML en `.github/workflows/` |
+  | `on` | Cuándo corre (`push`, `pull_request`, a mano con `workflow_dispatch`) |
+  | Job | Corre en un runner; los jobs van en paralelo salvo que uno declare `needs` |
+  | Step | Un paso concreto: un comando (`run`) o una action (`uses`) |
+  | Runner | La máquina: GitHub-hosted (`ubuntu-latest`, trae Docker) o self-hosted (tu PC) |
+  | Artifact | Archivos que un job sube (`actions/upload-artifact`) para descargar o pasar a otro job |
+  | Secrets y variables | Valores configurados en Settings del repo; los secrets nunca se muestran en los logs |
+  | Environment | Destino del deploy, con *required reviewers* (aprobación manual) y secrets propios |
+  | OIDC | `permissions: id-token: write`: el workflow se autentica en la nube con tokens de corta duración, sin guardar claves |
 
-- **Equivalencias con GitHub Actions:**
+- **Required status checks:** en el ruleset de `main` se exige que los jobs del CI pasen. Así un PR con un test roto no se puede mergear.
+- **Costo:** en repos públicos, los runners GitHub-hosted estándar son gratis y no hay que pedir ningún grant. En repos privados hay minutos mensuales incluidos.
 
-  | GitHub Actions | Azure Pipelines |
-  |---|---|
-  | workflow | pipeline |
-  | job | job |
-  | action | task |
-  | secrets | secret variables / variable groups |
-  | environments | environments |
-
-- **Costo:** para usar los agentes Microsoft-hosted gratis hay que pedir el *free grant* con un formulario. Pedilo en la Etapa 0, porque puede tardar días.
-
-**Cómo se aplica (`azure-pipelines.yml`, resumido)**
+**Cómo se aplica (`.github/workflows/ci.yml`, resumido)**
 
 ```yaml
-trigger:
-  branches: { include: [main] }
-pr:
-  branches: { include: [main] }
+name: CI
 
-variables:
-  buildConfiguration: Release
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
 
-stages:
-- stage: CI
-  jobs:
-  - job: Backend
-    pool: { vmImage: ubuntu-latest }   # trae Docker: Testcontainers funciona
+permissions:
+  contents: read                     # mínimo privilegio: el workflow solo lee el repo
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest           # trae Docker: Testcontainers funciona
     steps:
-    - task: UseDotNet@2
-      inputs: { packageType: sdk, version: 10.0.x }
-    - script: dotnet test backend -c $(buildConfiguration) --logger trx --collect:"XPlat Code Coverage"
-      displayName: Tests backend
-    - task: PublishTestResults@2
-      condition: succeededOrFailed()
-      inputs: { testResultsFormat: VSTest, testResultsFiles: '**/*.trx' }
-    - task: PublishCodeCoverageResults@2
-      inputs: { summaryFileLocation: '**/coverage.cobertura.xml' }
-    - script: |
-        dotnet tool restore
-        dotnet ef migrations bundle -p backend/src/Fulbito.Infrastructure -s backend/src/Fulbito.Api \
-          -o $(Build.ArtifactStagingDirectory)/migraciones/efbundle --self-contained -r linux-x64
-      displayName: Bundle de migraciones
-    - publish: $(Build.ArtifactStagingDirectory)/migraciones
-      artifact: migraciones
-    - task: Docker@2                      # la imagen de la API (§22)
-      displayName: Build y push de la imagen
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-      inputs:
-        command: buildAndPush
-        containerRegistry: sc-dockerhub    # service connection al registro
-        repository: $(dockerUser)/fulbito-api
-        Dockerfile: backend/Dockerfile
-        buildContext: backend
-        tags: |
-          $(Build.BuildId)
-          latest
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet test backend -c Release --logger trx --collect:"XPlat Code Coverage" --results-directory TestResults
+      - uses: actions/upload-artifact@v4
+        if: always()                 # sube los resultados aunque fallen los tests
+        with:
+          name: resultados-backend
+          path: TestResults
 
-  - job: Frontend
-    pool: { vmImage: ubuntu-latest }
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
-    - task: NodeTool@0
-      inputs: { versionSpec: 22.x }
-    - script: |
-        npm ci
-        npm test -- --run
-        npm run build
-      workingDirectory: frontend
-      env: { VITE_API_URL: $(apiUrl) }
-    - publish: frontend/dist
-      artifact: web
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test -- --run
+      - run: npm run build
 
-- stage: Deploy
-  dependsOn: CI
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  jobs:
-  - deployment: Produccion
-    environment: produccion            # acá se configura la aprobación manual
-    pool: { vmImage: ubuntu-latest }
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: AzureCLI@2
-            displayName: Migraciones
-            inputs:
-              azureSubscription: sc-fulbito
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                chmod +x $(Pipeline.Workspace)/migraciones/efbundle
-                $(Pipeline.Workspace)/migraciones/efbundle --connection "$(sqlConnection)"
-          - task: AzureWebAppContainer@1    # el App Service pasa a la imagen nueva
-            inputs:
-              azureSubscription: sc-fulbito
-              appName: app-fulbito-api
-              containers: docker.io/$(dockerUser)/fulbito-api:$(Build.BuildId)
-          - task: AzureStaticWebApp@0
-            inputs:
-              workingDirectory: $(Pipeline.Workspace)/web
-              app_location: /
-              skip_app_build: true
-              azure_static_web_apps_api_token: $(swaToken)
+  imagen:                            # la imagen de la API (§22), solo al mergear en main
+    needs: [backend, frontend]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: |
+            ${{ vars.DOCKERHUB_USER }}/fulbito-api:${{ github.run_number }}
+            ${{ vars.DOCKERHUB_USER }}/fulbito-api:latest
 ```
 
-Se despliega el tag `$(Build.BuildId)` y no `latest`, para saber exactamente qué versión está en producción y poder volver atrás. Docker Hub es gratis para imágenes públicas (la imagen no lleva secretos). Azure Container Registry es la alternativa privada, con costo mensual.
+Las versiones de las actions (`@v4`, `@v6`) son de referencia: al armar el workflow, usar la última versión mayor de cada una. `--collect:"XPlat Code Coverage"` necesita el paquete `coverlet.collector` en los proyectos de tests (se agrega en la Etapa 2). `DOCKERHUB_USER` es una variable y `DOCKERHUB_TOKEN` un secret del repo: un *access token* de Docker Hub, nunca la contraseña.
 
-`apiUrl`, `dockerUser`, `sqlConnection` y `swaToken` son variables del pipeline: las dos últimas marcadas como secretas o tomadas de un variable group vinculado a Key Vault. Para `dotnet tool restore` hace falta el manifiesto `.config/dotnet-tools.json` con `dotnet-ef`.
+Se publica con el tag `run_number` además de `latest`, para saber exactamente qué versión es cada imagen y poder volver atrás. Docker Hub es gratis para imágenes públicas (la imagen no lleva secretos).
 
-<details><summary>¿Cuál es la diferencia entre stage, job y step?</summary>
+**Si se suma el deploy en Azure (§24)**, se agrega un job `deploy` con `needs: imagen`, `environment: produccion` (aprobación manual) y `permissions: id-token: write`. Hace login con `azure/login` por OIDC, corre el bundle de migraciones, cambia la imagen del App Service con `azure/webapps-deploy` y despliega el front con `Azure/static-web-apps-deploy`.
 
-El step es una acción concreta (correr un comando, una task). Un job es un conjunto de steps que corre en un mismo agente. Un stage agrupa jobs y marca una fase del proceso, como CI o Deploy. Los stages pueden depender entre sí y tener condiciones; los jobs de un mismo stage pueden correr en paralelo.
+**Equivalencias con Azure DevOps** (por si se suma más adelante, o te lo preguntan en una entrevista)
+
+| GitHub | Azure DevOps |
+|---|---|
+| Milestone | Epic |
+| Issue | User Story / Product Backlog Item |
+| Sub-issue o lista de tareas | Task |
+| Campo `Iteration` del Project | Sprint |
+| `#123` en un commit | `AB#123` |
+| Workflow | Pipeline |
+| Jobs con `needs` | Stages y jobs |
+| Action | Task |
+| Runner | Agente |
+| Secrets y variables | Secret variables y variable groups |
+| Environment | Environment |
+| OIDC con `azure/login` | Service connection con *workload identity federation* |
+
+<details><summary>¿Cuál es la diferencia entre workflow, job y step?</summary>
+
+El step es una acción concreta: un comando o una action. Un job es un conjunto de steps que corre en un mismo runner, en orden. El workflow agrupa los jobs y define cuándo corre todo. Los jobs corren en paralelo salvo que uno dependa de otro con `needs`, como `imagen`, que espera a que pasen los tests de back y de front.
 </details>
 
-<details><summary>¿Cómo evitás tener secretos en el pipeline?</summary>
+<details><summary>¿Por qué el job de la imagen no corre en los PRs?</summary>
 
-La conexión a Azure usa una service connection con *workload identity federation*: el pipeline obtiene tokens de corta duración y no guarda ninguna clave. Los secretos que sí hacen falta van como variables secretas o en un variable group vinculado a Key Vault, nunca en el YAML. Y en runtime la app usa Managed Identity.
+Porque solo se publica lo que ya entró en `main`, después de la revisión. Además, los PRs que vienen de un fork no reciben los secrets del repo: si el job corriera en los PRs, cualquiera podría intentar usar `DOCKERHUB_TOKEN` desde un fork.
+</details>
+
+<details><summary>¿Cómo evitás tener secretos en el CI?</summary>
+
+Los que hacen falta, como el token de Docker Hub, van como secrets del repo o de un environment, nunca en el YAML, y GitHub los oculta en los logs. Para la nube se usa OIDC: el workflow pide tokens de corta duración y no hay ninguna clave guardada. Y en runtime, en Azure, la app usa Managed Identity.
 </details>
 
 <details><summary>¿Por qué desplegar una imagen Docker y no el código compilado?</summary>
 
-Porque la imagen es exactamente lo que se probó: mismo runtime, mismas dependencias, misma configuración base. Corre igual en tu PC, en el pipeline y en Azure, se vuelve a una versión anterior cambiando el tag y la misma imagen se puede llevar a otro servicio (Container Apps, Kubernetes) sin cambios.
+Porque la imagen es exactamente lo que se probó: mismo runtime, mismas dependencias, misma configuración base. Corre igual en tu PC, en el CI y en producción, se vuelve a una versión anterior cambiando el tag y la misma imagen se puede llevar a otro servicio (Container Apps, Kubernetes, Render) sin cambios.
 </details>
 
 <details><summary>¿Por qué las migraciones con un bundle y no `dotnet ef database update` en el deploy?</summary>
@@ -1270,7 +1260,7 @@ Porque la imagen es exactamente lo que se probó: mismo runtime, mismas dependen
 El bundle es un ejecutable generado en el CI junto con el resto del artefacto. El deploy no necesita el código fuente ni el SDK, y lo que se aplica es exactamente lo que se compiló y testeó (build once, deploy many).
 </details>
 
-<details><summary>¿Qué aporta Azure Boards si ya tenés el roadmap en un markdown?</summary>
+<details><summary>¿Qué aporta un GitHub Project si ya tenés el roadmap en un markdown?</summary>
 
-Trazabilidad y forma de trabajo de equipo. Cada commit y PR queda vinculado a una historia, se ve qué entró en cada sprint y cuánto se avanzó, y se practica Scrum como en una empresa. En entrevistas suelen preguntar cómo trabajás con historias, sprints y PRs: poder mostrar el tablero real ayuda.
+Trazabilidad y forma de trabajo de equipo. Cada commit y PR queda vinculado a un issue, se ve qué entró en cada sprint y cuánto se avanzó, y se practica Scrum como en una empresa. En entrevistas suelen preguntar cómo trabajás con historias, sprints y PRs: poder mostrar el tablero real ayuda, y los conceptos se trasladan tal cual a Jira o Azure Boards.
 </details>
