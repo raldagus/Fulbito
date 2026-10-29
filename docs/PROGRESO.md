@@ -3,7 +3,7 @@
 Claude Code actualiza este archivo al final de cada paso. Vos también podés editarlo.
 
 **Etapa actual:** 0 · Preparación
-**Próximo paso:** 0.8 Primer PR de la rama `etapa-0-preparacion` · **pendientes:** 0.5, 0.6 y 0.7 (Azure bloqueado, ver notas)
+**Próximo paso:** Etapa 1 · 1.1 Historias de usuario · **pendientes:** 0.5, 0.6 y 0.7 (Azure bloqueado, ver notas)
 
 **Azure Boards:** (pegar acá la URL del proyecto)
 **Grant de parallel jobs pedido el:** (fecha)
@@ -36,6 +36,7 @@ Claude Code actualiza este archivo al final de cada paso. Vos también podés ed
 - [ ] 0.5 Azure DevOps (organización y proyecto `Fulbito`, conectar GitHub) · **pendiente**: Microsoft bloqueó la creación de la cuenta
 - [ ] 0.6 Pedir el grant gratuito de parallel jobs de Azure Pipelines · **pendiente** (depende del 0.5)
 - [ ] 0.7 Cuenta gratuita de Azure + alerta de presupuesto · **pendiente** (mismo bloqueo)
+- [x] 0.8 Flujo rama → PR → merge practicado con los PRs #1 y #2 (docs) y el PR #3 (`etapa-0-preparacion`: 0.3–0.4, 6 commits) con *Create a merge commit* · REPASO §1 · merge d308f96
 
 ## Preguntas para repasar
 
@@ -48,6 +49,9 @@ Preguntas de entrevista que costaron. `/siguiente` y `/entrevista` las vuelven a
 - (§4) ¿A qué referencian los proyectos de tests? → mezcló referencias con "los tests tienen que ser independientes". La independencia es de **estado en ejecución** (un test no depende de otro); las referencias son de **compilación**: cada proyecto de tests referencia la capa que prueba (Domain.Tests→Domain, Application.Tests→Application, Api.IntegrationTests→Api, Specs→Application). Ningún proyecto de `src` referencia a `tests`.
 - (§4) Domain referenciando a Infrastructure → acertó el ciclo, pero le faltó el porqué arquitectónico: se pierde el aislamiento del dominio (tests unitarios sin base) y se acoplan las reglas a EF Core. La consulta va en el handler vía interfaz de Application; el dominio recibe los datos (DIP).
 - (§6) Primer test y `dotnet test` dice "No hay ninguna prueba disponible": nombró bien método no público, falta de runner y build viejo. Faltó la causa más común (**falta `[Fact]`/`[Theory]`**) y la herramienta de diagnóstico **`dotnet test --list-tests`** (separa descubrimiento de ejecución).
+- (§1) ¿Aparecen en el PR #3 los commits de los PRs anteriores? → dijo que sí, por usar merge commit. En realidad **no**: un PR muestra solo los commits que están en la rama y no en la base (`git log main..rama`); esos ya estaban en `main`. La estrategia de merge decide **cómo** entran los commits, no **cuáles**.
+- (§1) Merge commit, squash o rebase: eligió bien merge commit, pero argumentó "deja `main` intacto para desplegar" (falso: `main` cambia con cualquier estrategia; lo que lo mantiene desplegable son los PRs revisados y el CI). Argumento correcto: conserva cada commit (la historia `test:` → `feat:` → `refactor:` de TDD).
+- (§1) Rebase and merge: acertó que cambian los hashes (cambian el padre y el committer), pero faltó el problema: quien ya tenía la rama queda con commits "duplicados" y conflictos al integrar. Regla: no reescribir historia de ramas compartidas.
 
 ## Dudas y notas
 
