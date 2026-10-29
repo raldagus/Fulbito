@@ -77,22 +77,22 @@ docs/
 docker-compose.yml   # SQL Server; desde la Etapa 6 también API y front
 backend/Dockerfile   # imagen de la API (Etapa 6)
 frontend/Dockerfile  # imagen del front con nginx (Etapa 6, paso 7)
-azure-pipelines.yml  # CI/CD en Azure DevOps
+.github/workflows/ci.yml  # CI en GitHub Actions (CI desde la Etapa 5; se completa en la 12)
 infra/               # Bicep (opcional, Etapa 13)
 ```
 
 - Backend: .NET 10 (LTS), ASP.NET Core con controllers, EF Core + SQL Server, FluentValidation, Identity + JWT.
-- Base: SQL Server 2022 en Docker para local y tests; Azure SQL Database en producción. Mismo motor en todos lados.
-- Nube: Azure App Service corriendo la imagen Docker de la API, Azure Static Web Apps (front), Key Vault + Managed Identity (secretos), Application Insights (monitoreo).
-- Gestión y CI/CD: Azure DevOps. Azure Boards para historias y sprints, Azure Pipelines para build, tests y deploy. El código vive en GitHub (público, para el portfolio).
+- Base: SQL Server 2022 en Docker para local y tests. Si se suma el deploy en Azure, Azure SQL Database en producción: mismo motor en todos lados.
+- Gestión y CI: GitHub. **GitHub Projects + Issues** para historias y sprints, **GitHub Actions** para build, tests y la imagen Docker de la API. El código vive en GitHub (público, para el portfolio).
+- Más adelante (opcional, requiere suscripción de Azure con tarjeta): Azure DevOps (Boards y Pipelines) y el deploy en Azure: App Service con la imagen Docker de la API, Static Web Apps (front), Key Vault + Managed Identity (secretos) y Application Insights (monitoreo).
 - Fechas: se guardan en UTC (`DateTimeOffset`) y las reglas usan la hora local del complejo. El "ahora" siempre se obtiene de `TimeProvider`, nunca de `DateTime.Now`.
 
 ## Convenciones
 
 - Tests: `Metodo_Escenario_ResultadoEsperado` (ej. `Cancelar_ConMasDe24hDeAnticipacion_DevuelveLaSena`). Patrón AAA con comentarios `// Arrange`, `// Act`, `// Assert` en los primeros tests.
 - Errores de negocio: Result pattern (ver REPASO §11), sin excepciones para flujo normal.
-- Commits: `feat:`, `test:`, `refactor:`, `fix:`, `docs:`, `chore:`. Desde la Etapa 1, cada commit referencia su work item de Azure Boards con `AB#<id>` (ej. `test: superposición en los bordes AB#12`). Preguntá el número si no lo sabés.
-- Ramas: una por etapa (`etapa-2-dominio`), con PR a `main` al terminarla. El PR no se mergea si el pipeline de Azure no pasa.
+- Commits: `feat:`, `test:`, `refactor:`, `fix:`, `docs:`, `chore:`. Desde la Etapa 1, cada commit referencia su issue de GitHub con `#<número>` (ej. `test: superposición en los bordes #12`), y la descripción del PR usa `Closes #<número>` para cerrarlo al mergear. Preguntá el número si no lo sabés.
+- Ramas: una por etapa (`etapa-2-dominio`), con PR a `main` al terminarla. Desde que exista el CI, el PR no se mergea si GitHub Actions no pasa.
 - Azure: antes de crear cualquier recurso que pueda costar plata, avisá y confirmá que use un tier gratuito. Nunca guardes claves ni connection strings en el repo.
 
 ## Comandos útiles
