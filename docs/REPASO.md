@@ -25,7 +25,7 @@ El código es orientativo: Claude Code lo va construyendo con vos paso a paso y 
 
 **Qué tenés que saber**
 
-- Una rama por etapa, con un PR a `main` cuando la etapa termina. En el PR se revisa el diff completo.
+- Una rama por issue (`feat/7-reservar-cancha`), con un PR a `main` cuando el issue termina. Los cambios que no son una historia van en ramas cortas `docs/...`. En el PR se revisa el diff completo.
 - Commits chicos con Conventional Commits: `test: superposición de reservas en los bordes`, `feat: precio pico en fin de semana`.
 - En TDD, los commits cuentan la historia: primero `test:` (rojo), después `feat:` (verde) y después `refactor:`.
 

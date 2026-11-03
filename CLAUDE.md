@@ -92,7 +92,8 @@ infra/               # Bicep (opcional, Etapa 13)
 - Tests: `Metodo_Escenario_ResultadoEsperado` (ej. `Cancelar_ConMasDe24hDeAnticipacion_DevuelveLaSena`). Patrón AAA con comentarios `// Arrange`, `// Act`, `// Assert` en los primeros tests.
 - Errores de negocio: Result pattern (ver REPASO §11), sin excepciones para flujo normal.
 - Commits: `feat:`, `test:`, `refactor:`, `fix:`, `docs:`, `chore:`. Desde la Etapa 1, cada commit referencia su issue de GitHub con `#<número>` (ej. `test: superposición en los bordes #12`), y la descripción del PR usa `Closes #<número>` para cerrarlo al mergear. Preguntá el número si no lo sabés.
-- Ramas: una por etapa (`etapa-2-dominio`), con PR a `main` al terminarla. Desde que exista el CI, el PR no se mergea si GitHub Actions no pasa.
+- Ramas: una por issue (`feat/7-reservar-cancha`), con PR a `main` al terminarlo. Los cambios que no son una historia van en ramas cortas `docs/...`. Desde que exista el CI, el PR no se mergea si GitHub Actions no pasa.
+- Etapas: cada una es un Milestone (se crea en el repo y se ve como campo en el Project).
 - Azure: antes de crear cualquier recurso que pueda costar plata, avisá y confirmá que use un tier gratuito. Nunca guardes claves ni connection strings en el repo.
 
 ## Comandos útiles

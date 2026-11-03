@@ -2,14 +2,14 @@
 
 Claude Code actualiza este archivo al final de cada paso. Vos también podés editarlo.
 
-**Etapa actual:** 0 · Preparación
-**Próximo paso:** 0.5 Crear el GitHub Project `Fulbito` · después, Etapa 1 · 1.1 Historias de usuario
+**Etapa actual:** 1 · Descubrimiento
+**Próximo paso:** 1.1 Historias de usuario
 
-**GitHub Project:** (pegar acá la URL del Project)
+**GitHub Project:** https://github.com/users/raldagus/projects/1
 
 ## Etapas
 
-- [ ] 0 · Preparación
+- [x] 0 · Preparación
 - [ ] 1 · Descubrimiento (historias, Gherkin, bocetos, DER)
 - [ ] 2 · Dominio con TDD
 - [ ] 3 · Persistencia (EF Core + SQL Server + índice anti-superposición)
@@ -32,7 +32,7 @@ Claude Code actualiza este archivo al final de cada paso. Vos también podés ed
 - [x] 0.2 Kit en GitHub (CLAUDE.md, docs/, .claude/, compose, .env.example) por rama `etapa-0-preparacion` + PR · REPASO §1 · commit 16f21fd
 - [x] 0.3 SQL Server 2022 en Docker; conexión desde SSMS a `localhost,1433` con `sa` (`@@VERSION` → Developer Edition on Linux) · REPASO §22 · commit 3ad6a76
 - [x] 0.4 Solución `backend/Fulbito.slnx` + 4 proyectos de `src` (Application→Domain, Infrastructure→Application, Api→Application+Infrastructure, sin ejemplos de plantilla) y 4 de `tests` con xUnit v3 + VSTest en net10.0 (Domain.Tests→Domain, Application.Tests→Application, Api.IntegrationTests→Api, Specs→Application). `dotnet build` 0 warnings, `dotnet test` 0 tests con exit code 0 · REPASO §4 §6 · commits 76b7ca2, ccd9882
-- [ ] 0.5 GitHub Project `Fulbito` vinculado al repo, con `Status` e `Iteration` (reemplaza a Azure DevOps, el grant de Pipelines y la cuenta de Azure) · **pendiente**
+- [x] 0.5 GitHub Project `Fulbito` público y vinculado al repo, con `Status` e `Iteration` (sprints de 2 semanas desde 2026-11-02); reemplaza a Azure DevOps, el grant de Pipelines y la cuenta de Azure · REPASO §25
 - [x] 0.6 (antes 0.8) Flujo rama → PR → merge practicado con los PRs #1 y #2 (docs) y el PR #3 (`etapa-0-preparacion`: 0.3–0.4, 6 commits) con *Create a merge commit* · REPASO §1 · merge d308f96
 
 ## Preguntas para repasar
@@ -49,6 +49,7 @@ Preguntas de entrevista que costaron. `/siguiente` y `/entrevista` las vuelven a
 - (§1) ¿Aparecen en el PR #3 los commits de los PRs anteriores? → dijo que sí, por usar merge commit. En realidad **no**: un PR muestra solo los commits que están en la rama y no en la base (`git log main..rama`); esos ya estaban en `main`. La estrategia de merge decide **cómo** entran los commits, no **cuáles**.
 - (§1) Merge commit, squash o rebase: eligió bien merge commit, pero argumentó "deja `main` intacto para desplegar" (falso: `main` cambia con cualquier estrategia; lo que lo mantiene desplegable son los PRs revisados y el CI). Argumento correcto: conserva cada commit (la historia `test:` → `feat:` → `refactor:` de TDD).
 - (§1) Rebase and merge: acertó que cambian los hashes (cambian el padre y el committer), pero faltó el problema: quien ya tenía la rama queda con commits "duplicados" y conflictos al integrar. Regla: no reescribir historia de ramas compartidas.
+- (§25) Recorrido de un issue hasta Done: buen orden general y buena mención de TDD y de la revisión del diff. Faltó decir qué mueve la tarjeta (`In Progress` a mano; a `Done` la lleva el workflow *Item closed* del Project, porque `Closes #7` solo cierra el issue) y el sprint (`Iteration`). Ojo: contó como actual el CI obligatorio, que todavía no existe (workflow en la Etapa 5, required checks en la 12).
 
 ## Dudas y notas
 
