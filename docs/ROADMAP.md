@@ -176,6 +176,7 @@ Orden sugerido. Cada regla es uno o más ciclos 🔴🟢🔵:
 1. ASP.NET Core Identity con sus tablas en la misma base.
 2. Registro y login que devuelven un JWT con el rol.
 3. Roles Jugador, Dueño y Admin, y políticas de autorización.
+3b. **Alta de complejos y dueños (H8):** endpoint solo para Admin que crea un complejo y le asigna su dueño.
 4. R10: el dueño solo opera sobre **su** complejo (autorización por recurso, dentro del handler).
 5. Tests de integración: 401 sin token, 403 con otro rol o con el dueño de otro complejo.
 6. CORS configurado solo para el dominio del front.

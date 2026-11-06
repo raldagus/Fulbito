@@ -3,7 +3,7 @@
 Claude Code actualiza este archivo al final de cada paso. Vos también podés editarlo.
 
 **Etapa actual:** 1 · Descubrimiento
-**Próximo paso:** 1.1 Historias de usuario
+**Próximo paso:** 1.2 Criterios de aceptación
 
 **GitHub Project:** https://github.com/users/raldagus/projects/1
 
@@ -34,6 +34,7 @@ Claude Code actualiza este archivo al final de cada paso. Vos también podés ed
 - [x] 0.4 Solución `backend/Fulbito.slnx` + 4 proyectos de `src` (Application→Domain, Infrastructure→Application, Api→Application+Infrastructure, sin ejemplos de plantilla) y 4 de `tests` con xUnit v3 + VSTest en net10.0 (Domain.Tests→Domain, Application.Tests→Application, Api.IntegrationTests→Api, Specs→Application). `dotnet build` 0 warnings, `dotnet test` 0 tests con exit code 0 · REPASO §4 §6 · commits 76b7ca2, ccd9882
 - [x] 0.5 GitHub Project `Fulbito` público y vinculado al repo, con `Status` e `Iteration` (sprints de 2 semanas desde 2026-11-02); reemplaza a Azure DevOps, el grant de Pipelines y la cuenta de Azure · REPASO §25
 - [x] 0.6 (antes 0.8) Flujo rama → PR → merge practicado con los PRs #1 y #2 (docs) y el PR #3 (`etapa-0-preparacion`: 0.3–0.4, 6 commits) con *Create a merge commit* · REPASO §1 · merge d308f96
+- [x] 1.1 Historias de usuario: 8 en `docs/HISTORIAS.md` (H1–H8, cada una con sus reglas) y 5 para más adelante; paso 3b (alta de complejos y dueños, H8) agregado a la Etapa 8 · REPASO §14 §25 · commit 63ba96c
 
 ## Preguntas para repasar
 
@@ -49,6 +50,9 @@ Preguntas de entrevista que costaron. `/siguiente` y `/entrevista` las vuelven a
 - (§1) ¿Aparecen en el PR #3 los commits de los PRs anteriores? → dijo que sí, por usar merge commit. En realidad **no**: un PR muestra solo los commits que están en la rama y no en la base (`git log main..rama`); esos ya estaban en `main`. La estrategia de merge decide **cómo** entran los commits, no **cuáles**.
 - (§1) Merge commit, squash o rebase: eligió bien merge commit, pero argumentó "deja `main` intacto para desplegar" (falso: `main` cambia con cualquier estrategia; lo que lo mantiene desplegable son los PRs revisados y el CI). Argumento correcto: conserva cada commit (la historia `test:` → `feat:` → `refactor:` de TDD).
 - (§1) Rebase and merge: acertó que cambian los hashes (cambian el padre y el committer), pero faltó el problema: quien ya tenía la rama queda con commits "duplicados" y conflictos al integrar. Regla: no reescribir historia de ramas compartidas.
+- (§25) **Repaso 2026-11-04 (mejoró):** acertó Iteration en la planificación, arrastre al sprint siguiente y que `Closes` no reemplaza la revisión. Siguió diciendo "el merge con Closes lo lleva a Done": falta separar los dos mecanismos (`Closes` cierra el issue y el workflow *Item closed* mueve la tarjeta) y nombrar el pase manual a `In Progress`.
+- (§19 §25) Historias de usuario (1.1): se enfocó en funcionalidades periféricas (reportes, recordatorios, turnos fijos) y **olvidó la historia central, "reservar un turno"**, más confirmar seña y bloquear. Mezcló roles (admin viendo datos de reservas → es el dueño) y un beneficio falso ("para no perder mi seña", cuando R8 dice que con menos de 24 h se pierde). Para chequear: cruzar las historias con las reglas y ver que ninguna quede sin cubrir.
+- (§25) Pedido en mitad del sprint: bien (preguntar el porqué, al backlog, no tocar el sprint). Faltó: la regla nueva se escribe primero en la tabla del ROADMAP y se explica su impacto en R3/R9.
 - (§25) Recorrido de un issue hasta Done: buen orden general y buena mención de TDD y de la revisión del diff. Faltó decir qué mueve la tarjeta (`In Progress` a mano; a `Done` la lleva el workflow *Item closed* del Project, porque `Closes #7` solo cierra el issue) y el sprint (`Iteration`). Ojo: contó como actual el CI obligatorio, que todavía no existe (workflow en la Etapa 5, required checks en la 12).
 
 ## Dudas y notas
@@ -65,3 +69,5 @@ Preguntas de entrevista que costaron. `/siguiente` y `/entrevista` las vuelven a
 - Tests: xUnit v3 con **VSTest** (`xunit.v3.mtp-off`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`), plantillas instaladas con `dotnet new install xunit.v3.templates`. Con VSTest, 0 tests = aviso y exit code 0; con Microsoft.Testing.Platform sería exit code 8. Migrar a MTP más adelante si conviene (cambia paquete + `global.json`).
 - **`coverlet.collector` no está instalado** (la plantilla v3 no lo trae): agregarlo en la Etapa 2 a `Domain.Tests` para medir la cobertura >90 %.
 - Warning LF→CRLF al commitear: evaluar un `.gitattributes` más adelante.
+- Lenguaje del dominio: se usa **jugador** (no "cliente") en historias y features. Ojo: el REPASO usa `ClienteId` en el código; decidir el nombre al llegar a la Etapa 2.
+- Turnos fijos semanales: candidata para la Etapa 13 (ya figura en Extras); choca con R3 y R9, así que si entra necesita una regla nueva en el ROADMAP.
